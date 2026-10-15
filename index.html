@@ -168,10 +168,10 @@
        PANTALLA 1: LANDING CON CAMPANA ANIMADA
     ========================================= */
     .landing-screen {
-      padding: 2.5rem 1.6rem 2rem;
+      padding: 2rem 1.6rem 2rem;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       text-align: center;
       min-height: 100%;
@@ -181,20 +181,6 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      margin: auto 0;
-    }
-    .welcome-tag {
-      font-size: 0.76rem;
-      font-weight: 800;
-      color: #FCD34D;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-      background: rgba(252, 211, 77, 0.12);
-      border: 1px solid rgba(252, 211, 77, 0.3);
-      padding: 0.35rem 0.85rem;
-      border-radius: 9999px;
-      display: inline-block;
     }
     .welcome-title {
       font-size: 3rem;
@@ -206,33 +192,74 @@
       text-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
     }
     .welcome-desc {
-      font-size: 0.95rem;
-      line-height: 1.45;
+      font-size: 0.92rem;
+      line-height: 1.5;
       color: rgba(255, 255, 255, 0.88);
-      margin: 0.85rem 0 1.8rem;
+      margin: 0.75rem 0 1.5rem;
       max-width: 20rem;
     }
+    .highlight-yape { color: #FCD34D; font-weight: 700; }
+    .highlight-plin { color: #67E8F9; font-weight: 700; }
 
-    .landing-actions {
+    .landing-sections {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
-      margin-bottom: 1.5rem;
+      gap: 1.5rem;
     }
 
+    .btn-teal {
+      background: linear-gradient(90deg, #059669 0%, #0891b2 50%, #0284c7 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 25px rgba(13, 148, 136, 0.45);
+    }
+    .btn-teal:active {
+      opacity: 0.92;
+    }
+
+    .feature-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1rem;
+      margin-top: 0.65rem;
+    }
+    .feature-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .feature-badge .check-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .check-dot.amber { background: #F59E0B; color: #1e1b4b; }
+    .check-dot.teal { background: #10B981; color: #ffffff; }
+
     .ios-note {
-      padding: 0.85rem 1rem;
-      border-radius: 1rem;
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 0 0;
       font-size: 0.78rem;
       text-align: left;
-      line-height: 1.4;
+      line-height: 1.45;
       color: rgba(255, 255, 255, 0.8);
       width: 100%;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
     }
     .ios-note strong { color: #FCD34D; }
+    .ios-note .ios-icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .ios-note .ios-text strong.white-text { color: #ffffff; }
 
     /* =========================================
        PANTALLA 2: PIN DE ACCESO
@@ -629,25 +656,46 @@
             <span class="bell-anim lg">🔔</span>
           </div>
 
-          <div class="welcome-tag">Confirmación instantánea de pagos para vendedores</div>
           <h1 class="welcome-title">Notifex</h1>
-          <p class="welcome-desc">Activa los avisos para enterarte en tiempo real cuando un cliente realiza un Yape o Plin.</p>
+          <p class="welcome-desc">Activa los avisos para enterarte en tiempo real cuando un cliente realiza un <span class="highlight-yape">Yape</span> o <span class="highlight-plin">Plin</span>.</p>
 
-          <div class="landing-actions">
-            <button id="btnSubscribe" class="btn-pill btn-amber">
-              <span>🔔</span>
-              <span>Activar notificaciones</span>
-            </button>
+          <div class="landing-sections">
 
-            <button id="btnIrLogin" class="btn-pill btn-white">
-              <span>Ver cobros de hoy</span>
-              <span>→</span>
-            </button>
-          </div>
+            <!-- SECCIÓN 1: Activar notificaciones -->
+            <div>
+              <button id="btnSubscribe" class="btn-pill btn-amber">
+                <span>🔔</span>
+                <span>Activar notificaciones</span>
+              </button>
+              <div class="feature-badges">
+                <span class="feature-badge"><span class="check-dot amber">✓</span> Alertas Yape y Plin</span>
+                <span class="feature-badge"><span class="check-dot amber">✓</span> Confirmación al instante</span>
+                <span class="feature-badge"><span class="check-dot amber">✓</span> Sin abrir la app</span>
+              </div>
+            </div>
 
-          <div class="ios-note">
-            🍎 <strong>Importante para iPhone (iOS 16.4+):</strong><br>
-            Para recibir notificaciones, pulsa en el botón <strong>Compartir</strong> (icono de la flecha en Safari) y selecciona <strong>"Añadir a pantalla de inicio"</strong>. Luego abre la app desde la pantalla de inicio y pulsa Activar.
+            <!-- SECCIÓN 2: Nota iOS -->
+            <div class="ios-note">
+              <span class="ios-icon">🍎</span>
+              <div class="ios-text">
+                <strong>Importante para iPhone (iOS 16.4+):</strong><br>
+                Para recibir notificaciones, pulsa en el botón <strong class="white-text">Compartir</strong> (icono de la flecha en Safari) y selecciona <strong>"Añadir a pantalla de inicio"</strong>. Luego abre la app desde la pantalla de inicio y pulsa Activar.
+              </div>
+            </div>
+
+            <!-- SECCIÓN 3: Ver cobros de hoy -->
+            <div>
+              <button id="btnIrLogin" class="btn-pill btn-teal">
+                <span>Ver cobros de hoy</span>
+                <span>→</span>
+              </button>
+              <div class="feature-badges">
+                <span class="feature-badge"><span class="check-dot teal">✓</span> Acceso restringido</span>
+                <span class="feature-badge"><span class="check-dot teal">✓</span> Historial diario</span>
+                <span class="feature-badge"><span class="check-dot teal">✓</span> Exclusivo personal autorizado</span>
+              </div>
+            </div>
+
           </div>
 
         </div>
