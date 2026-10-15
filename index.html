@@ -148,6 +148,7 @@
     }
     .btn-amber:hover {
       background: #fbbf24;
+      transform: scale(1.02);
     }
     .btn-amber:disabled {
       background: #10B981;
@@ -213,8 +214,13 @@
       color: #ffffff;
       box-shadow: 0 8px 25px rgba(13, 148, 136, 0.45);
     }
+    .btn-teal:hover {
+      filter: brightness(1.08);
+      transform: scale(1.02);
+    }
     .btn-teal:active {
       opacity: 0.92;
+      transform: scale(0.97);
     }
 
     .feature-badges {
@@ -686,6 +692,7 @@
             <!-- SECCIÓN 3: Ver cobros de hoy -->
             <div>
               <button id="btnIrLogin" class="btn-pill btn-teal">
+                <span>🔒</span>
                 <span>Ver cobros de hoy</span>
                 <span>→</span>
               </button>
