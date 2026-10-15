@@ -57,7 +57,7 @@ function doGet(e) {
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
-  // 2. Extraer pagos de HOY de forma ultra rápida
+  // 2. Extraer pagos de HOY de arriba hacia abajo (los más recientes están arriba)
   const hojaNotif = libro.getSheetByName(NOMBRE_HOJA_NOTIF) || libro.getSheetByName("Notificaciones");
   const ultFilaNotif = hojaNotif ? hojaNotif.getLastRow() : 0;
   const fechaHoyStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy");
@@ -66,18 +66,21 @@ function doGet(e) {
   let sumaTotal = 0;
 
   if (ultFilaNotif >= 2) {
-    // Optimización de velocidad: Como los pagos se agregan al final, solo leemos las filas recientes (hasta 200 filas)
-    const cantFilasLeer = Math.min(ultFilaNotif - 1, 200);
-    const filaInicio = ultFilaNotif - cantFilasLeer + 1;
-    const datos = hojaNotif.getRange(filaInicio, 1, cantFilasLeer, 6).getValues();
+    // Leemos solo las filas superiores (donde están los pagos de hoy)
+    const cantFilasLeer = Math.min(ultFilaNotif - 1, 300);
+    const datos = hojaNotif.getRange(2, 1, cantFilasLeer, 6).getValues();
 
-    for (let i = datos.length - 1; i >= 0; i--) {
-      const fechaOp = datos[i][0] ? datos[i][0].toString() : "";
-      const app = datos[i][1] ? datos[i][1].toString() : "Pago";
-      const contenido = datos[i][2] ? datos[i][2].toString() : "";
+    for (let i = 0; i < datos.length; i++) {
+      const fechaOp = datos[i][0] ? datos[i][0].toString().trim() : "";
+      const app = datos[i][1] ? datos[i][1].toString().trim() : "Pago";
+      const contenido = datos[i][2] ? datos[i][2].toString().trim() : "";
       const monto = parseFloat(datos[i][3]) || 0;
-      const fechaEnvio = datos[i][5] ? datos[i][5].toString() : "";
+      const fechaEnvio = datos[i][5] ? datos[i][5].toString().trim() : "";
 
+      // Si la fila está vacía, saltar o continuar
+      if (!fechaOp && !contenido) continue;
+
+      // Si la fila corresponde al día de HOY:
       if (fechaOp.includes(fechaHoyStr) || fechaEnvio.includes(fechaHoyStr)) {
         sumaTotal += monto;
         pagosHoy.push({
@@ -86,6 +89,12 @@ function doGet(e) {
           monto: monto.toFixed(2),
           fecha: fechaOp || fechaEnvio
         });
+      } else {
+        // Como los pagos nuevos están arriba, si ya encontramos una fila con fecha de AYER o anterior,
+        // cortamos la lectura de inmediato con break para no leer nada más abajo.
+        if (fechaOp || fechaEnvio) {
+          break;
+        }
       }
     }
   }
