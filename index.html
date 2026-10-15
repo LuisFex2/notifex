@@ -553,13 +553,14 @@
     <div id="screenLanding" class="view-screen active">
       <div class="landing-card">
         <div class="bell-anim">🔔</div>
+        <div style="font-size: 11.5px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #fbbf24; margin-bottom: 6px;">Confirmación instantánea de pagos para vendedores</div>
         <h1>Notifex</h1>
-        <p>Instala nuestra app y recibe alertas de pagos y promociones directamente en tu celular.</p>
+        <p>Activa los avisos para enterarte en tiempo real cuando un cliente realiza un Yape o Plin.</p>
 
         <button id="btnSubscribe" class="btn-action">Activar notificaciones</button>
 
         <button id="btnIrLogin" class="btn-login-open">
-          <span>INICIAR SESIÓN</span>
+          <span>Ver cobros de hoy</span>
           <span>→</span>
         </button>
 
@@ -571,21 +572,16 @@
     </div>
 
     <!-- ==============================================
-         VISTA 2: FORMULARIO DE PIN (ESTILO FOTO)
+         VISTA 2: FORMULARIO DE PIN
     ============================================== -->
     <div id="screenPin" class="view-screen">
       <div class="pin-screen-card">
-        <div class="pin-bird">🦜</div>
+        <div class="bell-anim" style="font-size: 54px; margin-bottom: 10px;">🔔</div>
         <h2 class="pin-title">Únete a tu tienda</h2>
         <p class="pin-subtitle">Sin contraseña. Solo ingresa o pega el PIN.</p>
 
-        <div class="pin-tabs">
-          <button class="pin-tab active">PIN</button>
-        </div>
-
         <div class="pin-box">
-          <div class="pin-box-help">Ingresa el PIN proporcionado por el dueño</div>
-          <label class="pin-box-label">PIN de invitación</label>
+          <div class="pin-box-help" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 10px;">Ingresa el PIN proporcionado por el dueño</div>
           <div class="pin-input-group">
             <span class="pin-input-icon">🔢</span>
             <input type="password" id="inputPin" class="pin-input" placeholder="123456" maxlength="10" inputmode="numeric">
@@ -593,7 +589,7 @@
         </div>
 
         <button id="btnEntrarCaja" class="btn-enter-box">
-          <span>Entrar a la caja</span>
+          <span>Ingresar</span>
           <span>→</span>
         </button>
 
