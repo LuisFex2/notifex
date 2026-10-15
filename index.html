@@ -384,17 +384,16 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      background: #F8FAFC;
+      background: radial-gradient(circle at 50% 15%, #7E30E1 0%, #6B26D9 65%, #5314B5 100%);
       color: #2D1B54;
     }
     .dash-topbar {
-      background: #6B26D9;
-      padding: 0.95rem 1.25rem;
+      background: transparent;
+      padding: 1.25rem 1.35rem 1.45rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(107, 38, 217, 0.25);
       position: sticky;
       top: 0;
       z-index: 50;
@@ -445,10 +444,13 @@
     }
 
     .dash-body {
-      padding: 1.2rem 1.1rem 2.5rem;
+      background: #F8FAFC;
+      border-radius: 2rem 2rem 0 0;
+      box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.18);
+      padding: 1.5rem 1.25rem 2.5rem;
       display: flex;
       flex-direction: column;
-      gap: 1.1rem;
+      gap: 1.15rem;
       flex: 1;
     }
     .dash-section-bar {
@@ -475,29 +477,19 @@
       font-weight: 800;
       letter-spacing: 0;
     }
-    .live-indicator {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: #059669;
-      background: #ECFDF5;
-      padding: 0.25rem 0.65rem;
-      border-radius: 9999px;
-    }
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      background-color: #10B981;
+
+    .btn-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #ffffff;
       border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-      animation: ripple 1.8s infinite;
+      animation: btnSpin 0.6s linear infinite;
+      flex-shrink: 0;
     }
-    @keyframes ripple {
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    @keyframes btnSpin {
+      to { transform: rotate(360deg); }
     }
 
     .metrics-container {
@@ -731,10 +723,6 @@
               <span>MONITOREO TIEMPO REAL</span>
               <span class="date-badge" id="pillFecha">HOY</span>
             </div>
-            <div class="live-indicator">
-              <div class="live-dot"></div>
-              <span>EN VIVO</span>
-            </div>
           </div>
 
           <div class="metrics-container">
@@ -851,11 +839,11 @@
     };
 
     // Validar PIN con Google Sheets
-    async function verificarYEntrar(pin) {
+    async function verificarYEntrar(pin, esAutoLogin = false) {
       const btn = document.getElementById('btnEntrarCaja');
       const errEl = document.getElementById('pinError');
       btn.disabled = true;
-      btn.style.opacity = '0.7';
+      btn.innerHTML = '<span class="btn-spinner"></span><span>Verificando...</span>';
       errEl.style.display = 'none';
 
       try {
@@ -879,15 +867,23 @@
           if (timerAutoRefresh) clearInterval(timerAutoRefresh);
           timerAutoRefresh = setInterval(refrescarDashboard, 20000);
         } else {
-          errEl.textContent = data.error || 'PIN incorrecto o acceso revocado';
-          errEl.style.display = 'block';
+          if (esAutoLogin) {
+            localStorage.removeItem('notifex_pin');
+            pinSesion = '';
+            showScreen('screenLanding');
+          } else {
+            errEl.textContent = data.error || 'PIN incorrecto o acceso revocado';
+            errEl.style.display = 'block';
+          }
         }
       } catch (e) {
-        errEl.textContent = 'Error de conexión con la hoja. Intenta de nuevo.';
-        errEl.style.display = 'block';
+        if (!esAutoLogin) {
+          errEl.textContent = 'Error de conexión con la hoja. Intenta de nuevo.';
+          errEl.style.display = 'block';
+        }
       } finally {
         btn.disabled = false;
-        btn.style.opacity = '1';
+        btn.innerHTML = '<span>Ingresar</span><span>→</span>';
       }
     }
 
@@ -977,9 +973,10 @@
 
     document.getElementById('btnRefresh').onclick = refrescarDashboard;
 
-    // Auto-login si tenía sesión guardada
+    // Auto-login si tenía sesión guardada previa
     if (pinSesion) {
-      verificarYEntrar(pinSesion);
+      showScreen('screenDashboard');
+      verificarYEntrar(pinSesion, true);
     }
   </script>
 </body>
