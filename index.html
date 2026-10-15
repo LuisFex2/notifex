@@ -49,12 +49,29 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 18px;
+      gap: 10px;
+      font-size: 20px;
       font-weight: 800;
       color: #312e81;
+      letter-spacing: -0.4px;
     }
-    .brand .logo { font-size: 22px; }
+    
+    /* Campana animada oscilante */
+    .bell-anim {
+      font-size: 28px;
+      display: inline-block;
+      transform-origin: top center;
+      animation: swing 2.5s infinite ease-in-out;
+    }
+    @keyframes swing {
+      0%, 100% { transform: rotate(0deg); }
+      15% { transform: rotate(16deg); }
+      30% { transform: rotate(-14deg); }
+      45% { transform: rotate(8deg); }
+      60% { transform: rotate(-6deg); }
+      75% { transform: rotate(0deg); }
+    }
+
     .top-actions {
       display: flex;
       align-items: center;
@@ -96,7 +113,6 @@
       background: #fef3c7;
       color: #b45309;
       border: 1px solid #fde68a;
-      animation: pulse 2s infinite;
     }
 
     /* Main Content */
@@ -119,6 +135,18 @@
       letter-spacing: 0.8px;
       color: #64748b;
       text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .today-pill {
+      font-size: 10px;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-weight: 700;
+      letter-spacing: 0;
     }
     .live-badge {
       display: flex;
@@ -192,30 +220,6 @@
       letter-spacing: 0.6px;
       color: #64748b;
       text-transform: uppercase;
-    }
-
-    /* Filters */
-    .filters-row {
-      display: flex;
-      gap: 8px;
-    }
-    .filter-btn {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #475569;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .filter-btn.active {
-      background: #047857;
-      color: #ffffff;
-      border-color: #047857;
-      box-shadow: 0 4px 10px rgba(4, 120, 87, 0.25);
     }
 
     /* Transactions List */
@@ -318,10 +322,10 @@
 <body>
   <div class="app-container" id="app">
     
-    <!-- Top Bar -->
+    <!-- Top Bar con la campana dorada animada -->
     <header class="top-bar">
       <div class="brand">
-        <span class="logo">🔔</span>
+        <span class="bell-anim">🔔</span>
         <span>Notifex</span>
       </div>
       <div class="top-actions">
@@ -336,10 +340,13 @@
       
       <!-- Section Header -->
       <div class="section-header">
-        <div class="section-title">MONITOREO TIEMPO REAL</div>
+        <div class="section-title">
+          <span>MONITOREO TIEMPO REAL</span>
+          <span class="today-pill" id="pillFecha">HOY</span>
+        </div>
         <div class="live-badge">
           <div class="live-dot"></div>
-          <span id="txtActualizado">EN VIVO</span>
+          <span>EN VIVO</span>
         </div>
       </div>
 
@@ -347,7 +354,7 @@
       <div class="metrics-grid">
         <div class="metric-card accent-top">
           <div class="metric-val" id="numOperaciones">0</div>
-          <div class="metric-lbl">OPERACIONES</div>
+          <div class="metric-lbl">OPERACIONES HOY</div>
         </div>
         <div class="metric-card accent-bottom">
           <div class="metric-val money blur-money" id="numTotal">S/ 0.00</div>
@@ -355,18 +362,11 @@
         </div>
       </div>
 
-      <!-- Filters -->
-      <div class="filters-row">
-        <button class="filter-btn" id="btnTodos">TODOS</button>
-        <button class="filter-btn active" id="btnHoy">HOY</button>
-        <button class="filter-btn" id="btnAyer">AYER</button>
-      </div>
-
       <!-- List -->
       <div class="tx-list" id="txContainer">
         <div class="empty-state">
           <div class="empty-icon">⏳</div>
-          <p>Cargando operaciones...</p>
+          <p>Cargando pagos de hoy...</p>
         </div>
       </div>
 
@@ -380,7 +380,6 @@
 
     let privacyActive = false;
     let datosCargados = null;
-    let filtroActual = 'HOY';
 
     // 1. Inicialización de OneSignal
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -415,7 +414,7 @@
       }
     }
 
-    // 2. Cargar datos de Google Sheets
+    // 2. Cargar datos de Google Sheets (Solo de HOY)
     async function cargarDatos() {
       const iconRefresh = document.getElementById('btnRefresh');
       iconRefresh.style.transform = 'rotate(180deg)';
@@ -437,6 +436,11 @@
       const container = document.getElementById('txContainer');
       const numOperaciones = document.getElementById('numOperaciones');
       const numTotal = document.getElementById('numTotal');
+      const pillFecha = document.getElementById('pillFecha');
+
+      if (datosCargados.fecha) {
+        pillFecha.textContent = 'HOY (' + datosCargados.fecha + ')';
+      }
 
       const pagos = datosCargados.pagos || [];
 
@@ -447,7 +451,7 @@
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">☕</div>
-            <p>No hay pagos registrados para hoy.</p>
+            <p>Aún no hay pagos registrados para hoy.</p>
           </div>
         `;
         return;
@@ -502,23 +506,6 @@
       privacyActive = !privacyActive;
       document.getElementById('app').classList.toggle('privacy-mode', privacyActive);
       document.getElementById('btnPrivacy').textContent = privacyActive ? '🙈' : '👁️';
-    };
-
-    // Botones de Filtro
-    document.getElementById('btnHoy').onclick = () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('btnHoy').classList.add('active');
-      cargarDatos();
-    };
-    document.getElementById('btnTodos').onclick = () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('btnTodos').classList.add('active');
-      cargarDatos();
-    };
-    document.getElementById('btnAyer').onclick = () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('btnAyer').classList.add('active');
-      cargarDatos();
     };
 
     document.getElementById('btnRefresh').onclick = cargarDatos;
