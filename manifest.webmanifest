@@ -1,7 +1,7 @@
 {
-  "name": "PromoPush - Promociones",
-  "short_name": "PromoPush",
-  "description": "Recibe promociones, descuentos y avisos en tiempo real",
+  "name": "Notifex - Alertas de Pago",
+  "short_name": "Notifex",
+  "description": "Recibe alertas de pagos y promociones en tiempo real",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

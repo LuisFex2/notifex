@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="PromoPush">
   <link rel="apple-touch-icon" href="/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <title>PromoPush - Promociones y Avisos</title>
+  <title>Notifex - Promociones y Avisos</title>
   
   <!-- OneSignal SDK v16 -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -54,7 +54,7 @@
     }
     h1 {
       margin: 10px 0 8px;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
@@ -118,8 +118,8 @@
 <body>
   <main class="card">
     <div class="bell">🔔</div>
-    <h1>PromoPush</h1>
-    <p>Instala nuestra app y recibe promociones, descuentos y avisos directamente en tu celular.</p>
+    <h1>Notifex</h1>
+    <p>Instala nuestra app y recibe alertas de pagos y promociones directamente en tu celular.</p>
     
     <button id="subscribe" class="btn">Activar notificaciones</button>
     <div id="status">Preparando notificaciones...</div>
@@ -131,8 +131,8 @@
   </main>
 
   <script>
-    // ⚠️ REEMPLAZA ESTE APP_ID CON EL TUYO DE ONESIGNAL
-    const APP_ID = 'REEMPLAZA_CON_TU_ONESIGNAL_APP_ID';
+    // Tu OneSignal App ID
+    const APP_ID = '3a3a6c44-ad86-4ce0-b474-ede5f6c1c1d7';
 
     const statusEl = document.getElementById('status');
     const subscribeBtn = document.getElementById('subscribe');
