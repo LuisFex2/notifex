@@ -333,6 +333,29 @@
       width: 100%;
       color: #2D1B54;
     }
+    .pin-input::placeholder {
+      color: #94A3B8;
+      font-weight: 500;
+      letter-spacing: 2px;
+      opacity: 0.5;
+    }
+    .btn-toggle-eye {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.25rem;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.12s ease;
+    }
+    .btn-toggle-eye:active {
+      transform: scale(0.9);
+    }
 
     .pin-error-msg {
       font-size: 0.85rem;
@@ -661,7 +684,10 @@
             <label class="pin-label" for="inputPin">Ingresa el PIN proporcionado por el dueño</label>
             <div class="pin-input-wrap">
               <span class="pin-icon">🔢</span>
-              <input type="password" id="inputPin" class="pin-input" placeholder="123456" maxlength="10" inputmode="numeric">
+              <input type="password" id="inputPin" class="pin-input" placeholder="Ej. 123456" maxlength="10" inputmode="numeric">
+              <button type="button" id="btnTogglePin" class="btn-toggle-eye" title="Mostrar/ocultar PIN" tabindex="-1">
+                <span id="eyeIcon">👁️</span>
+              </button>
             </div>
           </div>
 
@@ -785,20 +811,34 @@
       document.getElementById('inputPin').focus();
     };
 
+    const inputPin = document.getElementById('inputPin');
+    const btnTogglePin = document.getElementById('btnTogglePin');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    // Revelar / Ocultar PIN con ojito
+    btnTogglePin.onclick = () => {
+      const isPassword = inputPin.type === 'password';
+      inputPin.type = isPassword ? 'text' : 'password';
+      eyeIcon.textContent = isPassword ? '🙈' : '👁️';
+      btnTogglePin.setAttribute('title', isPassword ? 'Ocultar PIN' : 'Mostrar PIN');
+    };
+
     const volverLanding = () => {
       showScreen('screenLanding');
       document.getElementById('pinError').style.display = 'none';
+      inputPin.type = 'password';
+      eyeIcon.textContent = '👁️';
     };
     document.getElementById('btnVolverLanding').onclick = volverLanding;
     document.getElementById('btnVolverLanding2').onclick = volverLanding;
 
     document.getElementById('btnEntrarCaja').onclick = () => {
-      const pin = document.getElementById('inputPin').value.trim();
+      const pin = inputPin.value.trim();
       if (!pin) return;
       verificarYEntrar(pin);
     };
 
-    document.getElementById('inputPin').onkeypress = (e) => {
+    inputPin.onkeypress = (e) => {
       if (e.key === 'Enter') document.getElementById('btnEntrarCaja').click();
     };
 
@@ -825,7 +865,9 @@
         if (data.autorizado) {
           pinSesion = pin;
           localStorage.setItem('notifex_pin', pin);
-          document.getElementById('inputPin').value = '';
+          inputPin.value = '';
+          inputPin.type = 'password';
+          eyeIcon.textContent = '👁️';
           
           if (data.usuario) {
             document.getElementById('txtUsuario').textContent = `👤 ${data.usuario.nombre} (${data.usuario.rol})`;
