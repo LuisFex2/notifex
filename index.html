@@ -21,8 +21,8 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      min-height: 100%;
       height: 100%;
+      overflow: hidden;
       background-color: #6B26D9;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: #2D1B54;
@@ -31,7 +31,7 @@
     body {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: stretch;
     }
     button, input, textarea, select { font-family: inherit; }
     button { cursor: pointer; border: none; }
@@ -39,22 +39,23 @@
     .app-shell {
       width: 100%;
       max-width: 440px;
-      min-height: 100vh;
+      height: 100%;
       background: radial-gradient(circle at 50% 15%, #7E30E1 0%, #6B26D9 65%, #5314B5 100%);
       display: flex;
       flex-direction: column;
       position: relative;
       color: #ffffff;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: hidden; /* Each screen manages its own scroll */
     }
 
     .view-screen {
       display: none;
       width: 100%;
-      min-height: 100vh;
+      height: 100%;
       flex-direction: column;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .view-screen.active {
       display: flex;
@@ -173,7 +174,7 @@
       justify-content: space-between;
       align-items: center;
       text-align: center;
-      min-height: 100vh;
+      min-height: 100%;
     }
     .landing-center {
       display: flex;
@@ -239,7 +240,7 @@
     .pin-screen-layout {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      min-height: 100%;
       width: 100%;
     }
     .pin-top-bar {
@@ -383,7 +384,7 @@
     .dashboard-layout {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      min-height: 100%;
       background: radial-gradient(circle at 50% 15%, #7E30E1 0%, #6B26D9 65%, #5314B5 100%);
       color: #2D1B54;
     }
@@ -847,11 +848,19 @@
       errEl.style.display = 'none';
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+      // Si tarda más de 8s, avisamos que el servidor se está despertando
+      const warmingId = setTimeout(() => {
+        if (btn.disabled) {
+          btn.innerHTML = '<span class="btn-spinner"></span><span>Despertando servidor...</span>';
+        }
+      }, 8000);
 
       try {
         const res = await fetch(`${API_URL}?pin=${encodeURIComponent(pin)}`, { signal: controller.signal });
         clearTimeout(timeoutId);
+        clearTimeout(warmingId);
         const data = await res.json();
 
         if (data.autorizado) {
@@ -882,11 +891,12 @@
         }
       } catch (e) {
         clearTimeout(timeoutId);
+        clearTimeout(warmingId);
         if (!esAutoLogin) {
           if (e.name === 'AbortError') {
-            errEl.textContent = 'La hoja tardó demasiado en responder. Intenta de nuevo.';
+            errEl.textContent = 'El servidor tardó demasiado. Intenta de nuevo en unos segundos.';
           } else {
-            errEl.textContent = 'Error de conexión con la hoja. Intenta de nuevo.';
+            errEl.textContent = 'Error de conexión. Verifica tu internet e intenta de nuevo.';
           }
           errEl.style.display = 'block';
         }
