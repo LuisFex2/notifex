@@ -14,10 +14,12 @@ function onOpen() {
 }
 
 /**
- * API WEB ULTRA RÁPIDA: Valida el PIN en la hoja "Accesos" y entrega solo los pagos de HOY.
+ * API WEB INSTANTÁNEA:
+ * - Valida PIN en Accesos (A2:E30 directo, sin getLastRow lento).
+ * - Extrae pagos de HOY en Notificaciones (A2:F150 directo, de arriba hacia abajo).
+ * - Frena de inmediato en cuanto la fecha cambia.
  */
 function doGet(e) {
-  const libro = SpreadsheetApp.getActiveSpreadsheet();
   const pinIngresado = (e && e.parameter && e.parameter.pin) ? e.parameter.pin.toString().trim() : "";
 
   if (!pinIngresado) {
@@ -27,29 +29,30 @@ function doGet(e) {
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
-  // 1. Validar PIN directamente en la hoja "Accesos"
+  const libro = SpreadsheetApp.getActiveSpreadsheet();
+
+  // 1. VALIDAR PIN DIRECTO EN HOJA ACCESOS (Rango directo A2:E30)
   const hojaAccesos = libro.getSheetByName(NOMBRE_HOJA_ACCESOS) || libro.getSheetByName("Accesos");
   let usuarioValido = null;
 
   if (hojaAccesos) {
-    const ultFilaAccesos = hojaAccesos.getLastRow();
-    if (ultFilaAccesos >= 2) {
-      const filas = hojaAccesos.getRange(2, 1, ultFilaAccesos - 1, 5).getValues();
-      for (let i = 0; i < filas.length; i++) {
-        const nombre = filas[i][0] ? filas[i][0].toString().trim() : "";
-        const pin = filas[i][1] ? filas[i][1].toString().trim() : "";
-        const rol = filas[i][3] ? filas[i][3].toString().trim() : "Vendedor";
-        const estado = filas[i][4] ? filas[i][4].toString().trim().toUpperCase() : "";
+    const filas = hojaAccesos.getRange("A2:E30").getValues();
+    for (let i = 0; i < filas.length; i++) {
+      const nombre = filas[i][0] ? filas[i][0].toString().trim() : "";
+      const pin = filas[i][1] ? filas[i][1].toString().trim() : "";
+      const rol = filas[i][3] ? filas[i][3].toString().trim() : "Vendedor";
+      const estado = filas[i][4] ? filas[i][4].toString().trim().toUpperCase() : "";
 
-        if (pin === pinIngresado && estado === "ACTIVO") {
-          usuarioValido = { nombre: nombre, rol: rol };
-          break;
-        }
+      if (!pin) continue;
+
+      if (pin === pinIngresado && estado === "ACTIVO") {
+        usuarioValido = { nombre: nombre, rol: rol };
+        break;
       }
     }
   }
 
-  // Si el PIN no existe o el vendedor está INACTIVO
+  // Si el PIN no existe o está INACTIVO: Detener de inmediato
   if (!usuarioValido) {
     return ContentService.createTextOutput(JSON.stringify({
       autorizado: false,
@@ -57,18 +60,15 @@ function doGet(e) {
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
-  // 2. Extraer pagos de HOY de arriba hacia abajo (los más recientes están arriba)
+  // 2. EXTRAER PAGOS DE HOY EN NOTIFICACIONES (Rango directo A2:F150)
   const hojaNotif = libro.getSheetByName(NOMBRE_HOJA_NOTIF) || libro.getSheetByName("Notificaciones");
-  const ultFilaNotif = hojaNotif ? hojaNotif.getLastRow() : 0;
   const fechaHoyStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy");
 
   const pagosHoy = [];
   let sumaTotal = 0;
 
-  if (ultFilaNotif >= 2) {
-    // Leemos solo las filas superiores (donde están los pagos de hoy)
-    const cantFilasLeer = Math.min(ultFilaNotif - 1, 300);
-    const datos = hojaNotif.getRange(2, 1, cantFilasLeer, 6).getValues();
+  if (hojaNotif) {
+    const datos = hojaNotif.getRange("A2:F150").getValues();
 
     for (let i = 0; i < datos.length; i++) {
       const fechaOp = datos[i][0] ? datos[i][0].toString().trim() : "";
@@ -77,10 +77,8 @@ function doGet(e) {
       const monto = parseFloat(datos[i][3]) || 0;
       const fechaEnvio = datos[i][5] ? datos[i][5].toString().trim() : "";
 
-      // Si la fila está vacía, saltar o continuar
       if (!fechaOp && !contenido) continue;
 
-      // Si la fila corresponde al día de HOY:
       if (fechaOp.includes(fechaHoyStr) || fechaEnvio.includes(fechaHoyStr)) {
         sumaTotal += monto;
         pagosHoy.push({
@@ -90,8 +88,7 @@ function doGet(e) {
           fecha: fechaOp || fechaEnvio
         });
       } else {
-        // Como los pagos nuevos están arriba, si ya encontramos una fila con fecha de AYER o anterior,
-        // cortamos la lectura de inmediato con break para no leer nada más abajo.
+        // En cuanto encontramos una fecha distinta a hoy, cortamos la lectura
         if (fechaOp || fechaEnvio) {
           break;
         }

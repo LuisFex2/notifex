@@ -846,8 +846,12 @@
       btn.innerHTML = '<span class="btn-spinner"></span><span>Verificando...</span>';
       errEl.style.display = 'none';
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
       try {
-        const res = await fetch(`${API_URL}?pin=${encodeURIComponent(pin)}`);
+        const res = await fetch(`${API_URL}?pin=${encodeURIComponent(pin)}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
         const data = await res.json();
 
         if (data.autorizado) {
@@ -877,8 +881,13 @@
           }
         }
       } catch (e) {
+        clearTimeout(timeoutId);
         if (!esAutoLogin) {
-          errEl.textContent = 'Error de conexión con la hoja. Intenta de nuevo.';
+          if (e.name === 'AbortError') {
+            errEl.textContent = 'La hoja tardó demasiado en responder. Intenta de nuevo.';
+          } else {
+            errEl.textContent = 'Error de conexión con la hoja. Intenta de nuevo.';
+          }
           errEl.style.display = 'block';
         }
       } finally {
