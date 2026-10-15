@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PromoPush">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <title>PromoPush - Promociones y Avisos</title>
+  
+  <!-- OneSignal SDK v16 -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 2.5rem 2rem;
+      border-radius: 1.5rem;
+      text-align: center;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    }
+    .bell {
+      font-size: 64px;
+      display: inline-block;
+      margin-bottom: 10px;
+      animation: swing 2.5s infinite ease-in-out;
+    }
+    @keyframes swing {
+      0%, 100% { transform: rotate(0deg); }
+      15% { transform: rotate(14deg); }
+      30% { transform: rotate(-12deg); }
+      45% { transform: rotate(8deg); }
+      60% { transform: rotate(-6deg); }
+      75% { transform: rotate(0deg); }
+    }
+    h1 {
+      margin: 10px 0 8px;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    p {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 0 0 24px;
+    }
+    .btn {
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 9999px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+    }
+    .btn:hover:not(:disabled) {
+      background: #fbbf24;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.5);
+    }
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    .btn:disabled {
+      background: #10b981;
+      color: #ffffff;
+      opacity: 0.9;
+      cursor: default;
+      box-shadow: none;
+    }
+    #status {
+      margin-top: 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      min-height: 20px;
+    }
+    .ios-note {
+      margin-top: 25px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 13px;
+      text-align: left;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.75);
+    }
+    .ios-note strong {
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="bell">🔔</div>
+    <h1>PromoPush</h1>
+    <p>Instala nuestra app y recibe promociones, descuentos y avisos directamente en tu celular.</p>
+    
+    <button id="subscribe" class="btn">Activar notificaciones</button>
+    <div id="status">Preparando notificaciones...</div>
+
+    <div class="ios-note">
+      🍎 <strong>Importante para iPhone (iOS 16.4+):</strong><br>
+      Para recibir notificaciones, pulsa en el botón <strong>Compartir</strong> (icono de la flecha en Safari) y selecciona <strong>"Añadir a pantalla de inicio"</strong>. Luego abre la app desde la pantalla de inicio y pulsa Activar.
+    </div>
+  </main>
+
+  <script>
+    // ⚠️ REEMPLAZA ESTE APP_ID CON EL TUYO DE ONESIGNAL
+    const APP_ID = 'REEMPLAZA_CON_TU_ONESIGNAL_APP_ID';
+
+    const statusEl = document.getElementById('status');
+    const subscribeBtn = document.getElementById('subscribe');
+    let sdkInstance = null;
+
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function(OneSignal) {
+      try {
+        if (!APP_ID || APP_ID.startsWith('REEMPLAZA')) {
+          statusEl.textContent = '⚠️ Configura tu APP_ID de OneSignal en index.html';
+          return;
+        }
+
+        await OneSignal.init({
+          appId: APP_ID,
+          allowLocalhostAsSecureOrigin: true
+        });
+
+        sdkInstance = OneSignal;
+        updateSubscriptionUI();
+
+        // Escuchar cambios de estado
+        OneSignal.User.PushSubscription.addEventListener('change', updateSubscriptionUI);
+      } catch (err) {
+        console.error('Error inicializando OneSignal:', err);
+        statusEl.textContent = 'Error de configuración: ' + err.message;
+      }
+    });
+
+    function updateSubscriptionUI() {
+      if (!sdkInstance) return;
+      const optedIn = sdkInstance.User.PushSubscription.optedIn;
+      if (optedIn) {
+        statusEl.textContent = '✅ ¡Notificaciones activas en este celular!';
+        subscribeBtn.textContent = 'Notificaciones Activadas';
+        subscribeBtn.disabled = true;
+      } else {
+        statusEl.textContent = '🔔 Pulsa el botón para recibir avisos';
+        subscribeBtn.textContent = 'Activar notificaciones';
+        subscribeBtn.disabled = false;
+      }
+    }
+
+    subscribeBtn.onclick = async () => {
+      if (!sdkInstance) return;
+      try {
+        await sdkInstance.User.PushSubscription.optIn();
+        updateSubscriptionUI();
+      } catch (err) {
+        console.error('Error suscribiendo:', err);
+        statusEl.textContent = 'Error al suscribir: ' + err.message;
+      }
+    };
+  </script>
+</body>
+</html>
