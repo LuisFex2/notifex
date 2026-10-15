@@ -2,190 +2,530 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PromoPush">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Notifex">
   <link rel="apple-touch-icon" href="/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <title>Notifex - Promociones y Avisos</title>
-  
+  <title>Notifex - Monitoreo Tiempo Real</title>
+
   <!-- OneSignal SDK v16 -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  
+
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      background-color: #f1f5f9;
+      color: #0f172a;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #312e81;
+    }
+    .brand .logo { font-size: 22px; }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-icon {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
-      padding: 20px;
-    }
-    .card {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 2.5rem 2rem;
-      border-radius: 1.5rem;
-      text-align: center;
-      max-width: 440px;
-      width: 100%;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-    }
-    .bell {
-      font-size: 64px;
-      display: inline-block;
-      margin-bottom: 10px;
-      animation: swing 2.5s infinite ease-in-out;
-    }
-    @keyframes swing {
-      0%, 100% { transform: rotate(0deg); }
-      15% { transform: rotate(14deg); }
-      30% { transform: rotate(-12deg); }
-      45% { transform: rotate(8deg); }
-      60% { transform: rotate(-6deg); }
-      75% { transform: rotate(0deg); }
-    }
-    h1 {
-      margin: 10px 0 8px;
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    p {
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 15px;
-      line-height: 1.5;
-      margin: 0 0 24px;
-    }
-    .btn {
-      background: #f59e0b;
-      color: #0f172a;
-      border: none;
-      padding: 15px 30px;
-      font-size: 16px;
-      font-weight: 700;
-      border-radius: 9999px;
       cursor: pointer;
-      width: 100%;
-      transition: all 0.2s ease;
-      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+      font-size: 16px;
+      color: #475569;
+      transition: all 0.2s;
     }
-    .btn:hover:not(:disabled) {
-      background: #fbbf24;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.5);
+    .btn-icon:hover { background: #e2e8f0; }
+    .btn-push {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
     }
-    .btn:active:not(:disabled) {
-      transform: translateY(0);
+    .btn-push.active {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
     }
-    .btn:disabled {
-      background: #10b981;
-      color: #ffffff;
-      opacity: 0.9;
-      cursor: default;
-      box-shadow: none;
+    .btn-push.inactive {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+      animation: pulse 2s infinite;
     }
-    #status {
-      margin-top: 18px;
-      font-size: 14px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.85);
-      min-height: 20px;
+
+    /* Main Content */
+    .content {
+      padding: 18px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
-    .ios-note {
-      margin-top: 25px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+
+    /* Header Section */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-title {
       font-size: 13px;
-      text-align: left;
-      line-height: 1.45;
-      color: rgba(255, 255, 255, 0.75);
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #64748b;
+      text-transform: uppercase;
     }
-    .ios-note strong {
-      color: #fbbf24;
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #059669;
+      background: #ecfdf5;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: ripple 1.8s infinite;
+    }
+    @keyframes ripple {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Metrics Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 16px 14px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card.accent-top::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+    }
+    .metric-card.accent-bottom::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+    }
+    .metric-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+      margin-bottom: 5px;
+    }
+    .metric-val.money {
+      color: #0f172a;
+      font-family: system-ui, sans-serif;
+    }
+    .metric-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    /* Filters */
+    .filters-row {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-btn {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn.active {
+      background: #047857;
+      color: #ffffff;
+      border-color: #047857;
+      box-shadow: 0 4px 10px rgba(4, 120, 87, 0.25);
+    }
+
+    /* Transactions List */
+    .tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tx-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      transition: transform 0.15s ease;
+    }
+    .tx-card:active { transform: scale(0.99); }
+    .tx-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .tx-avatar.interbank { background: #dcfce7; color: #15803d; }
+    .tx-avatar.yape { background: #f3e8ff; color: #7e22ce; }
+    .tx-avatar.bcp { background: #e0f2fe; color: #0369a1; }
+    .tx-avatar.default { background: #f1f5f9; color: #475569; }
+
+    .tx-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .tx-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .tx-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .tx-amount {
+      font-size: 18px;
+      font-weight: 800;
+      color: #059669;
+    }
+    .tx-desc {
+      font-size: 13.5px;
+      color: #4b5563;
+      line-height: 1.35;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+    .tx-bottom {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tx-badge {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #475569;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 2px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .tx-time {
+      font-size: 11.5px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: #94a3b8;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+    /* Blur for privacy */
+    .privacy-mode .blur-money {
+      filter: blur(5px);
+      user-select: none;
     }
   </style>
 </head>
 <body>
-  <main class="card">
-    <div class="bell">🔔</div>
-    <h1>Notifex</h1>
-    <p>Instala nuestra app y recibe alertas de pagos y promociones directamente en tu celular.</p>
+  <div class="app-container" id="app">
     
-    <button id="subscribe" class="btn">Activar notificaciones</button>
-    <div id="status">Preparando notificaciones...</div>
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="brand">
+        <span class="logo">🔔</span>
+        <span>Notifex</span>
+      </div>
+      <div class="top-actions">
+        <button id="btnPrivacy" class="btn-icon" title="Modo Privacidad">👁️</button>
+        <button id="btnRefresh" class="btn-icon" title="Actualizar">🔄</button>
+        <button id="btnSubscribe" class="btn-push inactive">Activar Push</button>
+      </div>
+    </header>
 
-    <div class="ios-note">
-      🍎 <strong>Importante para iPhone (iOS 16.4+):</strong><br>
-      Para recibir notificaciones, pulsa en el botón <strong>Compartir</strong> (icono de la flecha en Safari) y selecciona <strong>"Añadir a pantalla de inicio"</strong>. Luego abre la app desde la pantalla de inicio y pulsa Activar.
-    </div>
-  </main>
+    <!-- Main Content -->
+    <main class="content">
+      
+      <!-- Section Header -->
+      <div class="section-header">
+        <div class="section-title">MONITOREO TIEMPO REAL</div>
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          <span id="txtActualizado">EN VIVO</span>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card accent-top">
+          <div class="metric-val" id="numOperaciones">0</div>
+          <div class="metric-lbl">OPERACIONES</div>
+        </div>
+        <div class="metric-card accent-bottom">
+          <div class="metric-val money blur-money" id="numTotal">S/ 0.00</div>
+          <div class="metric-lbl">TOTAL RECIBIDO</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-row">
+        <button class="filter-btn" id="btnTodos">TODOS</button>
+        <button class="filter-btn active" id="btnHoy">HOY</button>
+        <button class="filter-btn" id="btnAyer">AYER</button>
+      </div>
+
+      <!-- List -->
+      <div class="tx-list" id="txContainer">
+        <div class="empty-state">
+          <div class="empty-icon">⏳</div>
+          <p>Cargando operaciones...</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
 
   <script>
-    // Tu OneSignal App ID
-    const APP_ID = '3a3a6c44-ad86-4ce0-b474-ede5f6c1c1d7';
+    // URL de tu Google Apps Script Web App
+    const API_URL = "https://script.google.com/macros/s/AKfycbzDYBJOAyMaKgodnl7Q-rKoPFLKVnFNnHpE3GahMeHK1YXuiMkqgIF4QT5uynUnrzaEUw/exec";
+    const ONESIGNAL_APP_ID = "3a3a6c44-ad86-4ce0-b474-ede5f6c1c1d7";
 
-    const statusEl = document.getElementById('status');
-    const subscribeBtn = document.getElementById('subscribe');
-    let sdkInstance = null;
+    let privacyActive = false;
+    let datosCargados = null;
+    let filtroActual = 'HOY';
 
+    // 1. Inicialización de OneSignal
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(async function(OneSignal) {
-      try {
-        if (!APP_ID || APP_ID.startsWith('REEMPLAZA')) {
-          statusEl.textContent = '⚠️ Configura tu APP_ID de OneSignal en index.html';
-          return;
+      await OneSignal.init({
+        appId: ONESIGNAL_APP_ID,
+        allowLocalhostAsSecureOrigin: true
+      });
+      updatePushStatus(OneSignal);
+      OneSignal.User.PushSubscription.addEventListener('change', () => updatePushStatus(OneSignal));
+
+      document.getElementById('btnSubscribe').onclick = async () => {
+        try {
+          await OneSignal.User.PushSubscription.optIn();
+          updatePushStatus(OneSignal);
+        } catch (e) {
+          console.error(e);
         }
-
-        await OneSignal.init({
-          appId: APP_ID,
-          allowLocalhostAsSecureOrigin: true
-        });
-
-        sdkInstance = OneSignal;
-        updateSubscriptionUI();
-
-        // Escuchar cambios de estado
-        OneSignal.User.PushSubscription.addEventListener('change', updateSubscriptionUI);
-      } catch (err) {
-        console.error('Error inicializando OneSignal:', err);
-        statusEl.textContent = 'Error de configuración: ' + err.message;
-      }
+      };
     });
 
-    function updateSubscriptionUI() {
-      if (!sdkInstance) return;
-      const optedIn = sdkInstance.User.PushSubscription.optedIn;
-      if (optedIn) {
-        statusEl.textContent = '✅ ¡Notificaciones activas en este celular!';
-        subscribeBtn.textContent = 'Notificaciones Activadas';
-        subscribeBtn.disabled = true;
+    function updatePushStatus(OneSignal) {
+      const btn = document.getElementById('btnSubscribe');
+      if (OneSignal.User.PushSubscription.optedIn) {
+        btn.textContent = 'Push Activo ✅';
+        btn.className = 'btn-push active';
+        btn.disabled = true;
       } else {
-        statusEl.textContent = '🔔 Pulsa el botón para recibir avisos';
-        subscribeBtn.textContent = 'Activar notificaciones';
-        subscribeBtn.disabled = false;
+        btn.textContent = 'Activar Push 🔔';
+        btn.className = 'btn-push inactive';
+        btn.disabled = false;
       }
     }
 
-    subscribeBtn.onclick = async () => {
-      if (!sdkInstance) return;
+    // 2. Cargar datos de Google Sheets
+    async function cargarDatos() {
+      const iconRefresh = document.getElementById('btnRefresh');
+      iconRefresh.style.transform = 'rotate(180deg)';
+      setTimeout(() => iconRefresh.style.transform = 'none', 300);
+
       try {
-        await sdkInstance.User.PushSubscription.optIn();
-        updateSubscriptionUI();
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        datosCargados = data;
+        renderUI();
       } catch (err) {
-        console.error('Error suscribiendo:', err);
-        statusEl.textContent = 'Error al suscribir: ' + err.message;
+        console.error('Error cargando Google Sheets:', err);
       }
+    }
+
+    function renderUI() {
+      if (!datosCargados) return;
+
+      const container = document.getElementById('txContainer');
+      const numOperaciones = document.getElementById('numOperaciones');
+      const numTotal = document.getElementById('numTotal');
+
+      const pagos = datosCargados.pagos || [];
+
+      numOperaciones.textContent = pagos.length;
+      numTotal.textContent = 'S/ ' + (datosCargados.totalMonto || '0.00');
+
+      if (pagos.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">☕</div>
+            <p>No hay pagos registrados para hoy.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pagos.map(pago => {
+        const appName = (pago.app || 'Pago').trim();
+        const appUpper = appName.toUpperCase();
+        let avatarClass = 'default';
+        let initial = appName.charAt(0).toUpperCase();
+
+        if (appUpper.includes('INTERBANK') || appUpper.includes('PLIN')) {
+          avatarClass = 'interbank';
+          initial = 'I';
+        } else if (appUpper.includes('YAPE')) {
+          avatarClass = 'yape';
+          initial = 'Y';
+        } else if (appUpper.includes('BCP')) {
+          avatarClass = 'bcp';
+          initial = 'B';
+        }
+
+        return `
+          <article class="tx-card">
+            <div class="tx-avatar ${avatarClass}">${initial}</div>
+            <div class="tx-info">
+              <div class="tx-top">
+                <span class="tx-title">${escapeHtml(appName)}</span>
+                <span class="tx-amount blur-money">S/ ${pago.monto}</span>
+              </div>
+              <div class="tx-desc">${escapeHtml(pago.contenido)}</div>
+              <div class="tx-bottom">
+                <span class="tx-badge">${escapeHtml(appName)}</span>
+                <span class="tx-time">${pago.fecha || ''}</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // Modo Privacidad (Ojo)
+    document.getElementById('btnPrivacy').onclick = () => {
+      privacyActive = !privacyActive;
+      document.getElementById('app').classList.toggle('privacy-mode', privacyActive);
+      document.getElementById('btnPrivacy').textContent = privacyActive ? '🙈' : '👁️';
     };
+
+    // Botones de Filtro
+    document.getElementById('btnHoy').onclick = () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btnHoy').classList.add('active');
+      cargarDatos();
+    };
+    document.getElementById('btnTodos').onclick = () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btnTodos').classList.add('active');
+      cargarDatos();
+    };
+    document.getElementById('btnAyer').onclick = () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btnAyer').classList.add('active');
+      cargarDatos();
+    };
+
+    document.getElementById('btnRefresh').onclick = cargarDatos;
+
+    // Cargar al inicio y auto-refrescar cada 20 segundos
+    cargarDatos();
+    setInterval(cargarDatos, 20000);
   </script>
 </body>
 </html>
