@@ -9,15 +9,12 @@
   <link rel="apple-touch-icon" href="/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>Notifex - Control de Caja</title>
-
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
   <!-- OneSignal SDK v16 -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -35,7 +32,6 @@
     }
     button, input, textarea, select { font-family: inherit; }
     button { cursor: pointer; border: none; }
-
     .app-shell {
       width: 100%;
       max-width: 440px;
@@ -48,7 +44,6 @@
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
       overflow: hidden; /* Each screen manages its own scroll */
     }
-
     .view-screen {
       display: none;
       width: 100%;
@@ -65,7 +60,6 @@
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     /* =========================================
        COMPONENTES GLOBALES Y LOGO CAMPANA
     ========================================= */
@@ -91,7 +85,6 @@
       margin: 0 auto 0.85rem;
       border-width: 2px;
     }
-
     /* Animación de balanceo de la campana */
     .bell-anim {
       display: inline-block;
@@ -102,7 +95,6 @@
     .bell-anim.lg { font-size: 48px; }
     .bell-anim.sm { font-size: 28px; }
     .bell-anim.dash { font-size: 22px; }
-
     @keyframes swing {
       0%, 100% { transform: rotate(0deg); }
       15% { transform: rotate(18deg); }
@@ -111,7 +103,6 @@
       60% { transform: rotate(-8deg); }
       75% { transform: rotate(0deg); }
     }
-
     /* Botones estilo Pill */
     .btn-pill {
       width: 100%;
@@ -132,6 +123,51 @@
     .btn-pill:active { transform: scale(0.97); }
     .btn-pill:disabled { opacity: 0.8; cursor: not-allowed; }
 
+    /* Botón principal (Ver cobros de hoy) */
+    .btn-primary-action {
+      background: #ffffff;
+      color: #6B26D9;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+    }
+    .btn-primary-action:hover {
+      background: #f8fafc;
+      transform: scale(1.02);
+    }
+    .btn-primary-action:active {
+      transform: scale(0.97);
+    }
+
+    /* Botón secundario (Activar notificaciones) */
+    .btn-secondary-action {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.45);
+      box-shadow: none;
+    }
+    .btn-secondary-action:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+    .btn-secondary-action:active {
+      transform: scale(0.97);
+    }
+
+    /* Estado de éxito (ya no es botón) */
+    .notif-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      width: 100%;
+      padding: 0.95rem 1.4rem;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1.5px solid rgba(16, 185, 129, 0.55);
+      color: #A7F3D0;
+      font-weight: 800;
+      font-size: 0.98rem;
+      pointer-events: none;
+    }
+
     .btn-white {
       background: #ffffff;
       color: #6B26D9;
@@ -140,22 +176,6 @@
     .btn-white:hover {
       background: #f8fafc;
     }
-
-    .btn-amber {
-      background: #F59E0B;
-      color: #1e1b4b;
-      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
-    }
-    .btn-amber:hover {
-      background: #fbbf24;
-      transform: scale(1.02);
-    }
-    .btn-amber:disabled {
-      background: #10B981;
-      color: #ffffff;
-      box-shadow: none;
-    }
-
     .btn-primary {
       background: #6B26D9;
       color: #ffffff;
@@ -164,7 +184,6 @@
     .btn-primary:active {
       background: #5b21b6;
     }
-
     /* =========================================
        PANTALLA 1: LANDING CON CAMPANA ANIMADA
     ========================================= */
@@ -201,28 +220,12 @@
     }
     .highlight-yape { color: #FCD34D; font-weight: 700; }
     .highlight-plin { color: #67E8F9; font-weight: 700; }
-
     .landing-sections {
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
     }
-
-    .btn-teal {
-      background: linear-gradient(90deg, #059669 0%, #0891b2 50%, #0284c7 100%);
-      color: #ffffff;
-      box-shadow: 0 8px 25px rgba(13, 148, 136, 0.45);
-    }
-    .btn-teal:hover {
-      filter: brightness(1.08);
-      transform: scale(1.02);
-    }
-    .btn-teal:active {
-      opacity: 0.92;
-      transform: scale(0.97);
-    }
-
     .feature-badges {
       display: flex;
       flex-wrap: wrap;
@@ -251,7 +254,6 @@
     }
     .check-dot.amber { background: #F59E0B; color: #1e1b4b; }
     .check-dot.teal { background: #10B981; color: #ffffff; }
-
     .ios-note {
       padding: 0 0;
       font-size: 0.78rem;
@@ -266,7 +268,6 @@
     .ios-note strong { color: #FCD34D; }
     .ios-note .ios-icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 0.1rem; }
     .ios-note .ios-text strong.white-text { color: #ffffff; }
-
     /* =========================================
        PANTALLA 2: PIN DE ACCESO
     ========================================= */
@@ -300,7 +301,6 @@
       background: rgba(255, 255, 255, 0.3);
       transform: scale(0.95);
     }
-
     .pin-header-area {
       padding: 0.75rem 1.6rem 1.5rem;
       text-align: center;
@@ -317,7 +317,6 @@
       color: rgba(255, 255, 255, 0.82);
       line-height: 1.4;
     }
-
     .bottom-sheet {
       background: #ffffff;
       border-radius: 2rem 2rem 0 0;
@@ -390,7 +389,6 @@
     .btn-toggle-eye:active {
       transform: scale(0.9);
     }
-
     .pin-error-msg {
       font-size: 0.85rem;
       color: #EF4444;
@@ -398,7 +396,6 @@
       text-align: center;
       display: none;
     }
-
     .btn-return-link {
       background: transparent;
       border: none;
@@ -410,7 +407,6 @@
       margin-top: 0.5rem;
       text-decoration: underline;
     }
-
     /* =========================================
        PANTALLA 3: DASHBOARD EN TIEMPO REAL
     ========================================= */
@@ -476,7 +472,6 @@
       background: rgba(239, 68, 68, 0.3);
       border: 1px solid rgba(239, 68, 68, 0.5);
     }
-
     .dash-body {
       background: #F8FAFC;
       border-radius: 2rem 2rem 0 0;
@@ -511,7 +506,6 @@
       font-weight: 800;
       letter-spacing: 0;
     }
-
     .btn-spinner {
       display: inline-block;
       width: 16px;
@@ -525,7 +519,6 @@
     @keyframes btnSpin {
       to { transform: rotate(360deg); }
     }
-
     .metrics-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -569,7 +562,6 @@
       color: #64748B;
       text-transform: uppercase;
     }
-
     .tx-stream {
       display: flex;
       flex-direction: column;
@@ -601,7 +593,6 @@
     .tx-badge-avatar.interbank { background: #DCFCE7; color: #15803D; }
     .tx-badge-avatar.bcp { background: #E0F2FE; color: #0369A1; }
     .tx-badge-avatar.default { background: #F1F5F9; color: #475569; }
-
     .tx-detail-wrap { flex: 1; min-width: 0; }
     .tx-header-line {
       display: flex;
@@ -634,14 +625,12 @@
       text-transform: uppercase;
     }
     .tx-timestamp { font-size: 0.7rem; color: #94A3B8; font-weight: 500; }
-
     .empty-stream-state {
       padding: 3rem 1.5rem;
       text-align: center;
       color: #94A3B8;
     }
     .empty-stream-icon { font-size: 2.75rem; margin-bottom: 0.65rem; }
-
     .privacy-mode .blur-money {
       filter: blur(5px);
       user-select: none;
@@ -650,7 +639,6 @@
 </head>
 <body>
   <div class="app-shell" id="appShell">
-
     <!-- ==============================================
          VISTA 1: LANDING CON CAMPANA Y BOTONES
     ============================================== -->
@@ -661,18 +649,20 @@
           <div class="logo-circle lg">
             <span class="bell-anim lg">🔔</span>
           </div>
-
           <h1 class="welcome-title">Notifex</h1>
           <p class="welcome-desc">Activa los avisos para enterarte en tiempo real cuando un cliente realiza un <span class="highlight-yape">Yape</span> o <span class="highlight-plin">Plin</span>.</p>
-
           <div class="landing-sections">
-
             <!-- SECCIÓN 1: Activar notificaciones -->
             <div>
-              <button id="btnSubscribe" class="btn-pill btn-amber">
+              <button id="btnSubscribe" class="btn-pill btn-secondary-action">
                 <span>🔔</span>
                 <span>Activar notificaciones</span>
               </button>
+              <!-- Estado cuando ya están activadas (no es botón) -->
+              <div id="notifStatus" class="notif-status" style="display: none;">
+                <span>✅</span>
+                <span>Notificaciones activadas</span>
+              </div>
               <div class="feature-badges">
                 <span class="feature-badge"><span class="check-dot amber">✓</span> Alertas de pagos</span>
                 <span class="feature-badge"><span class="check-dot amber">✓</span> Confirmación al instante</span>
@@ -680,10 +670,9 @@
                 <span class="feature-badge"><span class="check-dot amber">✓</span> Sin abrir la app</span>
               </div>
             </div>
-
-            <!-- SECCIÓN 3: Ver cobros de hoy -->
+            <!-- SECCIÓN 2: Ver cobros de hoy (acción principal) -->
             <div>
-              <button id="btnIrLogin" class="btn-pill btn-teal">
+              <button id="btnIrLogin" class="btn-pill btn-primary-action">
                 <span>🔒</span>
                 <span>Ver cobros de hoy</span>
                 <span>→</span>
@@ -694,13 +683,10 @@
                 <span class="feature-badge"><span class="check-dot teal">✓</span> Exclusivo personal autorizado</span>
               </div>
             </div>
-
           </div>
-
         </div>
       </div>
     </div>
-
     <!-- ==============================================
          VISTA 2: FORMULARIO DE PIN
     ============================================== -->
@@ -710,7 +696,6 @@
         <header class="pin-top-bar">
           <button id="btnVolverLanding" class="btn-back-round" title="Volver">←</button>
         </header>
-
         <div class="pin-header-area">
           <div class="logo-circle sm">
             <span class="bell-anim sm">🔔</span>
@@ -718,7 +703,6 @@
           <h2>Únete a tu tienda</h2>
           <p>Sin contraseña. Solo ingresa o pega el PIN.</p>
         </div>
-
         <div class="bottom-sheet">
           <div class="pin-box-card">
             <label class="pin-label" for="inputPin">Ingresa el PIN proporcionado por el dueño</label>
@@ -730,20 +714,15 @@
               </button>
             </div>
           </div>
-
           <button id="btnEntrarCaja" class="btn-pill btn-primary">
             <span>Ingresar</span>
             <span>→</span>
           </button>
-
           <div id="pinError" class="pin-error-msg">PIN incorrecto o acceso revocado</div>
-
           <button id="btnVolverLanding2" class="btn-return-link">← Volver al inicio</button>
         </div>
-
       </div>
     </div>
-
     <!-- ==============================================
          VISTA 3: MONITOREO TIEMPO REAL (DESBLOQUEADO)
     ============================================== -->
@@ -764,7 +743,6 @@
             <button id="btnCerrarSesion" class="btn-circle-action danger" title="Bloquear / Salir">🔒</button>
           </div>
         </header>
-
         <main class="dash-body">
           <div class="dash-section-bar">
             <div class="dash-section-title">
@@ -772,7 +750,6 @@
               <span class="date-badge" id="pillFecha">HOY</span>
             </div>
           </div>
-
           <div class="metrics-container">
             <div class="metric-box accent-purple">
               <div class="metric-number" id="numOperaciones">0</div>
@@ -783,7 +760,6 @@
               <div class="metric-tag">TOTAL RECIBIDO</div>
             </div>
           </div>
-
           <div class="tx-stream" id="txContainer">
             <div class="empty-stream-state">
               <div class="empty-stream-icon">⏳</div>
@@ -791,27 +767,21 @@
             </div>
           </div>
         </main>
-
       </div>
     </div>
-
   </div>
-
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzDYBJOAyMaKgodnl7Q-rKoPFLKVnFNnHpE3GahMeHK1YXuiMkqgIF4QT5uynUnrzaEUw/exec";
     const ONESIGNAL_APP_ID = "3a3a6c44-ad86-4ce0-b474-ede5f6c1c1d7";
-
     let pinSesion = localStorage.getItem('notifex_pin') || '';
     let privacyActive = false;
     let timerAutoRefresh = null;
-
     // Navegación de Vistas
     function showScreen(screenId) {
       document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
       const target = document.getElementById(screenId);
       if (target) target.classList.add('active');
     }
-
     // Inicializar OneSignal
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(async function(OneSignal) {
@@ -821,7 +791,6 @@
       });
       updatePushBtn(OneSignal);
       OneSignal.User.PushSubscription.addEventListener('change', () => updatePushBtn(OneSignal));
-
       document.getElementById('btnSubscribe').onclick = async () => {
         try {
           await OneSignal.User.PushSubscription.optIn();
@@ -829,28 +798,30 @@
         } catch (e) { console.error(e); }
       };
     });
-
     function updatePushBtn(OneSignal) {
       const btn = document.getElementById('btnSubscribe');
+      const status = document.getElementById('notifStatus');
+
       if (OneSignal.User.PushSubscription.optedIn) {
-        btn.innerHTML = '<span>✅</span><span>Notificaciones Activadas</span>';
-        btn.disabled = true;
+        // Ya activadas → ocultar botón y mostrar estado
+        btn.style.display = 'none';
+        status.style.display = 'flex';
       } else {
+        // Aún no → mostrar botón y ocultar estado
+        btn.style.display = 'flex';
+        status.style.display = 'none';
         btn.innerHTML = '<span>🔔</span><span>Activar notificaciones</span>';
         btn.disabled = false;
       }
     }
-
     // Botones de pantalla Landing y PIN
     document.getElementById('btnIrLogin').onclick = () => {
       showScreen('screenPin');
       document.getElementById('inputPin').focus();
     };
-
     const inputPin = document.getElementById('inputPin');
     const btnTogglePin = document.getElementById('btnTogglePin');
     const eyeIcon = document.getElementById('eyeIcon');
-
     // Revelar / Ocultar PIN con ojito
     btnTogglePin.onclick = () => {
       const isPassword = inputPin.type === 'password';
@@ -858,7 +829,6 @@
       eyeIcon.textContent = isPassword ? '🙈' : '👁️';
       btnTogglePin.setAttribute('title', isPassword ? 'Ocultar PIN' : 'Mostrar PIN');
     };
-
     const volverLanding = () => {
       showScreen('screenLanding');
       document.getElementById('pinError').style.display = 'none';
@@ -867,17 +837,14 @@
     };
     document.getElementById('btnVolverLanding').onclick = volverLanding;
     document.getElementById('btnVolverLanding2').onclick = volverLanding;
-
     document.getElementById('btnEntrarCaja').onclick = () => {
       const pin = inputPin.value.trim();
       if (!pin) return;
       verificarYEntrar(pin);
     };
-
     inputPin.onkeypress = (e) => {
       if (e.key === 'Enter') document.getElementById('btnEntrarCaja').click();
     };
-
     // Cerrar sesión
     document.getElementById('btnCerrarSesion').onclick = () => {
       localStorage.removeItem('notifex_pin');
@@ -885,7 +852,6 @@
       if (timerAutoRefresh) clearInterval(timerAutoRefresh);
       showScreen('screenLanding');
     };
-
     // Validar PIN con Google Sheets
     async function verificarYEntrar(pin, esAutoLogin = false) {
       const btn = document.getElementById('btnEntrarCaja');
@@ -893,23 +859,19 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="btn-spinner"></span><span>Verificando...</span>';
       errEl.style.display = 'none';
-
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 25000);
-
       // Si tarda más de 8s, avisamos que el servidor se está despertando
       const warmingId = setTimeout(() => {
         if (btn.disabled) {
           btn.innerHTML = '<span class="btn-spinner"></span><span>Despertando servidor...</span>';
         }
       }, 8000);
-
       try {
         const res = await fetch(`${API_URL}?pin=${encodeURIComponent(pin)}`, { signal: controller.signal });
         clearTimeout(timeoutId);
         clearTimeout(warmingId);
         const data = await res.json();
-
         if (data.autorizado) {
           pinSesion = pin;
           localStorage.setItem('notifex_pin', pin);
@@ -920,10 +882,8 @@
           if (data.usuario) {
             document.getElementById('txtUsuario').textContent = `👤 ${data.usuario.nombre} (${data.usuario.rol})`;
           }
-
           showScreen('screenDashboard');
           renderDashboard(data);
-
           if (timerAutoRefresh) clearInterval(timerAutoRefresh);
           timerAutoRefresh = setInterval(refrescarDashboard, 20000);
         } else {
@@ -952,7 +912,6 @@
         btn.innerHTML = '<span>Ingresar</span><span>→</span>';
       }
     }
-
     async function refrescarDashboard() {
       if (!pinSesion) return;
       try {
@@ -966,19 +925,15 @@
         }
       } catch (e) { console.error(e); }
     }
-
     function renderDashboard(data) {
       const container = document.getElementById('txContainer');
       const numOperaciones = document.getElementById('numOperaciones');
       const numTotal = document.getElementById('numTotal');
       const pillFecha = document.getElementById('pillFecha');
-
       if (data.fecha) pillFecha.textContent = 'HOY (' + data.fecha + ')';
       const pagos = data.pagos || [];
-
       numOperaciones.textContent = pagos.length;
       numTotal.textContent = 'S/ ' + (data.totalMonto || '0.00');
-
       if (pagos.length === 0) {
         container.innerHTML = `
           <div class="empty-stream-state">
@@ -988,13 +943,11 @@
         `;
         return;
       }
-
       container.innerHTML = pagos.map(pago => {
         const appName = (pago.app || 'Pago').trim();
         const appUpper = appName.toUpperCase();
         let avatarClass = 'default';
         let initial = appName.charAt(0).toUpperCase();
-
         if (appUpper.includes('INTERBANK') || appUpper.includes('PLIN')) {
           avatarClass = 'interbank';
           initial = 'I';
@@ -1005,7 +958,6 @@
           avatarClass = 'bcp';
           initial = 'B';
         }
-
         return `
           <article class="tx-item">
             <div class="tx-badge-avatar ${avatarClass}">${initial}</div>
@@ -1024,21 +976,17 @@
         `;
       }).join('');
     }
-
     function escapeHtml(text) {
       if (!text) return '';
       return text.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
-
     // Modo Privacidad
     document.getElementById('btnPrivacy').onclick = () => {
       privacyActive = !privacyActive;
       document.getElementById('dashContainer').classList.toggle('privacy-mode', privacyActive);
       document.getElementById('btnPrivacy').textContent = privacyActive ? '🙈' : '👁️';
     };
-
     document.getElementById('btnRefresh').onclick = refrescarDashboard;
-
     // Auto-login si tenía sesión guardada previa
     if (pinSesion) {
       showScreen('screenDashboard');
